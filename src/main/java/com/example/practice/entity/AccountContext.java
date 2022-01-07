@@ -1,0 +1,64 @@
+package com.example.practice.entity;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+
+public class AccountContext implements UserDetails {
+    private String username;
+    private String password;
+    private Collection<? extends GrantedAuthority> authorities;
+    private boolean accountNonExpired = true;
+    private boolean accountNonLocked = true;
+    private boolean credentialsNonExpired = true;
+    private boolean enabled = true;
+
+    private final Member member;
+
+    public AccountContext(Member member, Collection<? extends GrantedAuthority> authorities) {
+        this.username = member.getMemIdx();
+        this.password = member.getMemPassword();
+        this.authorities = authorities;
+        this.member = member;
+    }
+
+    public Member getAccount(){
+        return member;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.authorities;
+    }
+
+    @Override
+    public String getPassword() {
+        return this.password;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.username;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return this.accountNonExpired;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return this.accountNonLocked;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return this.credentialsNonExpired;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+}
