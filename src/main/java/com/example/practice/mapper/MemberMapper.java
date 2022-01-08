@@ -16,4 +16,8 @@ public interface MemberMapper {
     int insertMember(Member member);
 
     Member selectMemberByEmail(String email);
+
+    int checkIsMemberIdExist(String memId);
+
+    int checkIsMemberNickExist(String memNick);
 }

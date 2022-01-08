@@ -26,4 +26,16 @@
             SELECT LAST_INSERT_ID()
         </selectKey>
     </insert>
+
+    <select id="checkIsMemberIdExist" parameterType="String" resultType="int">
+        SELECT COUNT(*)
+          FROM member
+        WHERE MEM_ID = #{memId};
+    </select>
+
+    <select id="checkIsMemberNickExist" parameterType="String" resultType="int">
+        SELECT COUNT(*)
+          FROM member
+        WHERE MEM_NICK = #{memNick};
+    </select>
 </mapper>

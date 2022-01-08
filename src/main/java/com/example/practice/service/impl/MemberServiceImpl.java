@@ -23,6 +23,7 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    //로그인 하면 일로옴 by Spring Security
     @Override
     public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
         Member member = memberMapper.selectMember(id);
@@ -36,6 +37,24 @@ public class MemberServiceImpl implements MemberService {
     public int insertMember(Member member){
         member.setMemPassword(passwordEncoder.encode(member.getMemPassword()));
         return memberMapper.insertMember(member);
+    }
+
+    @Override
+    public boolean checkIsMemberIdExist(String memId) {
+        int result = memberMapper.checkIsMemberIdExist(memId);
+        if(result != 0){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean checkIsMemberNickExist(String memNick) {
+        int result = memberMapper.checkIsMemberNickExist(memNick);
+        if(result != 0){
+            return true;
+        }
+        return false;
     }
 
 

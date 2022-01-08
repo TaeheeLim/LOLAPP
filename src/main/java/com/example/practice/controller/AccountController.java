@@ -9,12 +9,13 @@ import com.example.practice.service.impl.EmailServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 public class AccountController {
-    private final MemberService accountService;
+    private final MemberService memberService;
     private final MemberMapper memberMapper;
     private final EmailService emailService;
 
@@ -28,7 +29,7 @@ public class AccountController {
         member.setMemCell("01097176807");
         member.setMemRole(Role.ROLE_USER.getCode());
 
-        int result = accountService.insertMember(member);
+        int result = memberService.insertMember(member);
 
         if(result != 0){
             return memberMapper.selectMember(member.getMemIdx());
@@ -48,11 +49,6 @@ public class AccountController {
 
     @PostMapping("/sign/verifyCode")
     public int verifyCode(String code){
-        System.out.println("--------");
-        System.out.println(code);
-        System.out.println(EmailServiceImpl.key);
-        System.out.println("-------");
-
         int result = 0;
         if(EmailServiceImpl.key.equals(code)){
             result = 1;
@@ -61,10 +57,22 @@ public class AccountController {
     }
 
     @PostMapping("/sign/signUp")
-    public Map<String, Object> signUpMember(@RequestBody Map<String, Object> map){
-        System.out.println(">>>>>>");
-        System.out.println(map.toString());
+    public Map<String, Object> signUpMember(Member member){
+        System.out.println(member.toString());
+        Map<String, Object> map = new HashMap<>();
+
         map.put("Ok", "Ok");
         return map;
     }
+
+    @PostMapping("/sign/idCheck")
+    public boolean checkId(String memId){
+        return memberService.checkIsMemberIdExist(memId);
+    }
+
+    @PostMapping("/sign/nickCheck")
+    public boolean checkNick(String memNick){
+        return memberService.checkIsMemberNickExist(memNick);
+    }
+
 }
