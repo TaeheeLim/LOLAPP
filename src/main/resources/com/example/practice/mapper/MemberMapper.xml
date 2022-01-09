@@ -20,8 +20,8 @@
     </select>
 
     <insert id="insertMember" parameterType="Member" useGeneratedKeys="true" keyColumn="MEM_IDX" keyProperty="memIdx">
-        INSERT INTO member(MEM_ID, MEM_NICK, MEM_PASSWORD, MEM_EMAIL, MEM_CELL, MEM_ROLE)
-        VALUES(#{memId}, #{memNick}, #{memPassword}, #{memEmail}, #{memCell}, #{memRole});
+        INSERT INTO member(MEM_ID, MEM_NICK, MEM_PASSWORD, MEM_EMAIL, MEM_CELL, MEM_ROLE, SIGN_DATE)
+        VALUES(#{memId}, #{memNick}, #{memPassword}, #{memEmail}, #{memCell}, #{memRole}, SYSDATE());
         <selectKey keyColumn="MEM_IDX" keyProperty="memIdx" resultType="String" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>

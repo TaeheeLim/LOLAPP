@@ -4,6 +4,9 @@ import com.sun.istack.internal.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.util.Date;
+
 @Data
 @NoArgsConstructor
 public class Member {
@@ -21,4 +24,8 @@ public class Member {
     private String memCell;
     @NotNull
     private String memRole;
+    @NotNull
+    private LocalDate signDate;
+    @NotNull
+    private LocalDate lastLoginDate;
 }

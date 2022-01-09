@@ -9,4 +9,6 @@ public interface MemberService extends UserDetailsService {
     boolean checkIsMemberIdExist(String memId);
 
     boolean checkIsMemberNickExist(String memNick);
+
+    Member selectMember(String memIdx);
 }

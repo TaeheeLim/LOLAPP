@@ -1,6 +1,5 @@
 package com.example.practice.mapper;
 
-import com.example.practice.entity.Account;
 import com.example.practice.entity.Member;
 import org.apache.ibatis.annotations.Mapper;
 

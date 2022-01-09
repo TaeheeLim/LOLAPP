@@ -1,5 +1,6 @@
 package com.example.practice;
 
+import com.example.practice.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,8 +20,9 @@ import javax.sql.DataSource;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-//    private final AccountService accountService;
+    private final MemberService memberService;
     private final DataSource dataSource;
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -48,12 +50,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .maxSessionsPreventsLogin(false)
                 .sessionRegistry(sessionRegistry());
 //
-//        http.rememberMe()
-//                .key("remember")
-//                .rememberMeParameter("remember-me")
-//                .userDetailsService(accountService)
-//                .tokenValiditySeconds(86400*30)
-//                .tokenRepository(getJDBCRepository());
+        http.rememberMe()
+                .key("remember")
+                .rememberMeParameter("remember-me")
+                .userDetailsService(memberService)
+                .tokenValiditySeconds(86400*30)
+                .tokenRepository(getJDBCRepository());
     }
     @Bean
     public PasswordEncoder passwordEncoder(){
