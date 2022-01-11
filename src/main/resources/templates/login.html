@@ -1,15 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <title>Spring Security Example </title>
 </head>
 <body>
 <div id="login-container">
     <div id="login-mid-container">
-        <div th:if="${param.error}">
-            Invalid username and password.
-        </div>
+
         <div th:if="${param.logout}">
             You have been logged out.
         </div>
@@ -17,6 +14,9 @@
             <form th:action="@{/login}" method="post">
                 <div><label> User Name : <input type="text" name="username"/></label></div>
                 <div><label> Password: <input type="password" name="password"/></label></div>
+                <div th:if="${param.error}">
+                    <div class="exception"></div>
+                </div>
                 <span><input type="submit" value="Sign In"/></span>
                 <span><input type="checkbox" name="remember-me">Remember ID</span>
             </form>
@@ -31,6 +31,32 @@
         </div>
     </div>
 </div>
+<script th:inline="javascript">
+/* <![CDATA[ */
+const exception = /*[[${param.exception}]]*/;
+const cnt = /*[[${param.cnt}]]*/;
+/* ]]> */
+
+if(exception!=null){
+    const error = document.querySelector(".exception");
+    console.log(exception);
+    console.log(error)
+    if(exception=="Password"){
+        error.innerHTML = "비밀번호가<b>" + cnt + "회</b> 틀렸습니다.";
+    }else if (exception=="Account"){
+        error.innerHTML = "<b>계정이</b> 존재하지 않습니다.";
+    }else if (exception=="Secret"){
+        error.innerHTML = "잘못된 <b>토큰접근</b>입니다.";
+    }else if (exception=="Disable"){
+        error.innerHTML = "계정이 <b>잠겼습니다.</b>";
+    }else if (exception=="Duplicate"){
+        error.innerHTML = "계정이 이미 <b>접속중</b>입니다.";
+    }
+
+
+}
+
+</script>
 </body>
 </html>
 <style>
@@ -44,7 +70,7 @@
 #login-mid-container {
     border: 1px solid green;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     /*justify-content: space-around;*/
     /*height: 100%;*/
     /*width: 100%;*/

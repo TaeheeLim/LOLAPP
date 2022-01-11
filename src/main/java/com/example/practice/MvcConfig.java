@@ -18,25 +18,6 @@ public class MvcConfig implements WebMvcConfigurer {
         registry.addViewController("/login").setViewName("login");
         registry.addViewController("/signUpMember").setViewName("signUpMember");
         registry.addViewController("/signUp").setViewName("signUp");
-        registry.addRedirectViewController("/", "/login");
-        registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        registry.addRedirectViewController("/", "/home");
     }
-    /**
-     * 언어 변경을 위한 인터셉터를 생성한다.
-     */
-    @Bean
-    public LocaleChangeInterceptor localeChangeInterceptor() {
-        LocaleChangeInterceptor interceptor = new LocaleChangeInterceptor();
-        interceptor.setParamName("lang");
-        return interceptor;
-    }
-
-    /**
-     * 인터셉터를 등록한다.
-     */
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(localeChangeInterceptor());
-    }
-
 }

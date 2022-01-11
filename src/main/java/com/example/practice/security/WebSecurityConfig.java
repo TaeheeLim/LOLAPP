@@ -31,11 +31,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/create").permitAll()
                     .antMatchers("/signUp").permitAll()
                     .antMatchers("/sign/**").permitAll()
+                    .antMatchers("/login","/login/**").permitAll()
                     .anyRequest().authenticated()
                     .and()
                 .formLogin()
                     .loginPage("/login")
-                    .defaultSuccessUrl("/")
+                    .defaultSuccessUrl("/home")
                     .failureHandler(failureHandler)
                     .permitAll()
                     .and()
@@ -48,7 +49,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .sessionManagement()
                     .maximumSessions(1)
-                    .maxSessionsPreventsLogin(false)
+                    .maxSessionsPreventsLogin(true)
                     .expiredUrl("/login")
                     .sessionRegistry(sessionRegistry());
 

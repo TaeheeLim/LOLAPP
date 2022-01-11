@@ -10,6 +10,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.authentication.session.SessionAuthenticationException;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
@@ -27,50 +28,42 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
     private String exceptionMsgName;
     private String defaultFailureUrl;
 
-    private final MessageSource messageSource;
     private final MemberMapper memberMapper;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        String loginId = request.getParameter("username");
-        String errormsg = exception.getMessage();
-
-        if(exception instanceof BadCredentialsException) {
-            errormsg = failCnt(loginId);
-            // 잠긴계정인지 확인하여, errormsg변경해준다.
-//            boolean userUnLock = true;
-//            userUnLock = failCnt(loginId);
-//            if ( !userUnLock )
-//                errormsg = messageSource.getMessage("AccountStatusUserDetailsChecker.disabled", null , Locale.KOREA);
-//            else
-//                errormsg = messageSource.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", null , Locale.KOREA);
-        } else if(exception instanceof InternalAuthenticationServiceException) {
-            errormsg = messageSource.getMessage("AbstractUserDetailsAuthenticationProvider.InternalAuthentication", null , Locale.KOREA);
-        } else if(exception instanceof DisabledException) {
-            errormsg = messageSource.getMessage("AccountStatusUserDetailsChecker.disabled", null , Locale.KOREA);
-        } else if(exception instanceof CredentialsExpiredException) {
-            errormsg = messageSource.getMessage("AccountStatusUserDetailsChecker.expired", null , Locale.KOREA);
-        } else if(exception instanceof UsernameNotFoundException) {
-            Object[] args = new String[] { loginId } ;
-            errormsg = messageSource.getMessage("DigestAuthenticationFilter.usernameNotFound", args , Locale.KOREA);
-        } else if(exception instanceof AccountExpiredException) {
-            errormsg = messageSource.getMessage("AbstractUserDetailsAuthenticationProvider.expired", null , Locale.KOREA);
-        } else if(exception instanceof LockedException) {
-            errormsg = messageSource.getMessage("AbstractUserDetailsAuthenticationProvider.locked", null , Locale.KOREA);
+        String username = request.getParameter("username");
+        String msg = "";
+        if(exception instanceof BadCredentialsException){
+            msg = failCnt(username);
+        }else if(exception instanceof InternalAuthenticationServiceException){
+            msg = "Account";
+        }else if(exception instanceof InsufficientAuthenticationException){
+            msg = "Secret";
+        }else if(exception instanceof LockedException){
+            msg = "Disable";
+        }else if(exception instanceof SessionAuthenticationException){
+            msg = "Duplicate";
+        }else if(exception instanceof DisabledException){
+            System.out.print(exception);
+        }else{
+            System.out.print(exception);
         }
-
-        setDefaultFailureUrl("/login?error=true&exception="+errormsg);
+        setDefaultFailureUrl("/login?error=true&exception=" + msg);
         super.onAuthenticationFailure(request, response, exception);
     }
 
     public String failCnt(String loginId){
         Member member = memberMapper.selectMember(loginId);
+        if(member == null){
+            return "Account";
+        }
         if(member.getLoginFailCount() >= 5){
-            return "Disabled";
+            return "Disable";
         } else {
             memberMapper.updateFailCount(loginId);
             Member getMember = memberMapper.selectMember(loginId);
-            return "Password&cnt = " + getMember.getLoginFailCount();
+            return "Password&cnt=" + getMember.getLoginFailCount();
         }
     }
 

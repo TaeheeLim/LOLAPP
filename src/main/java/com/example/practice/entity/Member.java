@@ -12,7 +12,7 @@ import java.util.Collection;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Member{
+public class Member {
     @NotNull
     private String memId;
     @NotNull
