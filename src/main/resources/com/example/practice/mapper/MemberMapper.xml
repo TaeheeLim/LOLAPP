@@ -10,7 +10,7 @@
     <select id="selectMember" parameterType="String" resultType="Member">
         SELECT *
           FROM member
-         WHERE MEM_IDX = #{memIdx};
+         WHERE MEM_ID = #{memId};
     </select>
 
     <select id="selectMemberByEmail" parameterType="String" resultType="Member">
@@ -19,12 +19,10 @@
          WHERE MEM_EMAIL = #{memEmail};
     </select>
 
-    <insert id="insertMember" parameterType="Member" useGeneratedKeys="true" keyColumn="MEM_IDX" keyProperty="memIdx">
-        INSERT INTO member(MEM_ID, MEM_NICK, MEM_PASSWORD, MEM_EMAIL, MEM_CELL, MEM_ROLE, SIGN_DATE)
-        VALUES(#{memId}, #{memNick}, #{memPassword}, #{memEmail}, #{memCell}, #{memRole}, SYSDATE());
-        <selectKey keyColumn="MEM_IDX" keyProperty="memIdx" resultType="String" order="AFTER">
-            SELECT LAST_INSERT_ID()
-        </selectKey>
+    <insert id="insertMember" parameterType="Member">
+        INSERT INTO member(MEM_ID, MEM_NICK, MEM_PASSWORD, MEM_EMAIL, MEM_CELL, MEM_ROLE, SIGN_DATE, LOGIN_FAIL_COUNT)
+        VALUES(#{memId}, #{memNick}, #{memPassword}, #{memEmail}, #{memCell}, #{memRole}, SYSDATE(), 0);
+
     </insert>
 
     <select id="checkIsMemberIdExist" parameterType="String" resultType="int">
@@ -38,4 +36,24 @@
           FROM member
         WHERE MEM_NICK = #{memNick};
     </select>
+
+    <select id="forgotPassword" parameterType="Member" resultType="Member">
+        SELECT *
+          FROM member
+         WHERE MEM_ID = #{memId}
+           AND MEM_NICK = #{memNick}
+           AND MEM_EMAIL = #{memEmail}
+    </select>
+
+    <update id="updatePassword" parameterType="String">
+        UPDATE member
+           SET MEM_PASSWORD = #{memPassword}
+         WHERE MEM_ID = #{memId}
+    </update>
+
+    <update id="updateFailCount" parameterType="String">
+        UPDATE member
+            SET LOGIN_FAIL_COUNT = LOGIN_FAIL_COUNT + 1
+        WHERE MEM_ID = #{memId}
+    </update>
 </mapper>

@@ -19,4 +19,10 @@ public interface MemberMapper {
     int checkIsMemberIdExist(String memId);
 
     int checkIsMemberNickExist(String memNick);
+
+    Member forgotPassword(Member member);
+
+    int updatePassword(String memPassword, String memId);
+
+    int updateFailCount(String memId);
 }

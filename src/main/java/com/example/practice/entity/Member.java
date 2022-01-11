@@ -1,17 +1,18 @@
 package com.example.practice.entity;
 
 import com.sun.istack.internal.NotNull;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.Collection;
 
 @Data
 @NoArgsConstructor
-public class Member {
-    @NotNull
-    private String memIdx;
+@AllArgsConstructor
+@Builder
+public class Member{
     @NotNull
     private String memId;
     @NotNull
@@ -28,4 +29,6 @@ public class Member {
     private LocalDate signDate;
     @NotNull
     private LocalDate lastLoginDate;
+    @NotNull
+    private int loginFailCount;
 }

@@ -44,10 +44,11 @@
                 </div>
                 <div>
                     <label for="email-input">이메일 주소 : </label>
-                    <span><input id="email-input" name="memEmail" type="text" required></span>
+                    <span><input id="email-input" name="memEmail" type="text" autocomplete="off"></span>
                     <span>
                         <button type="button" id="send-email-btn">인증번호 보내기</button>
                     </span>
+                    <span id="email-exist-span" class="hidden"></span>
                     <span id="email-span" class="hidden"></span>
                     <div id="check-code-wrapper" class="hidden">
                         <input id="check-code" type="text" maxlength="8"/>
@@ -95,7 +96,7 @@ const idCheck = document.querySelector('#id-input')
 const checkingCell = document.querySelector('#cell-input')
 const nickCheck = document.querySelector('#nick-input')
 const nickSpan = document.querySelector('#nick-span')
-
+const emailInput = document.querySelector('#email-input')
 //비밀번호 정규식
 const PASSWORDREG_1 = /[A-Za-z\d#?!@$%^&*-]{8,}$/
 const PASSWORDREG_2 = /(?=.*?[a-z])(?=.*?[A-Z])/
@@ -239,7 +240,9 @@ signBtn.addEventListener('click', function(){
         idSpan.style.color = 'red'
         idSpan.style.fontSize = '10px'
         idSpan.innerHTML = '아이디를 형식에 맞게 입력해주세요'
-    } else if(!checkPassword){
+        return
+    }
+    if(!checkPassword){
         password.focus()
         const wrongPassSpan = document.querySelector('#wrong-pass-span')
         wrongPassSpan.classList.remove('hidden')
@@ -269,6 +272,63 @@ signBtn.addEventListener('click', function(){
 
 })
 
+emailInput.addEventListener('click', function() {
+    if (emailInput.getAttribute("readonly")) {
+        const wrapper = document.querySelector('#check-code-wrapper');
+        wrapper.classList.add('hidden')
+        emailBtn.removeAttribute("disabled")
+        emailInput.removeAttribute("readonly")
+    }
+})
+
+emailInput.addEventListener('keyup', function(){
+    if(emailInput.getAttribute("readonly")) {
+        return
+    }
+
+    const userEmail = document.querySelector('#email-input').value
+    const emailSpan = document.querySelector('#email-exist-span')
+
+    if(!EMAILREG.test(userEmail)){
+        emailSpan.classList.remove('hidden')
+        emailSpan.innerHTML = '형식에 맞게 입력해주세요'
+        emailSpan.style.color = "red"
+        emailSpan.style.fontSize = '10px'
+        return
+    } else {
+        emailSpan.classList.add('hidden')
+        checkEmail = true
+        console.log(checkEmail)
+    }
+    $.ajax({
+        url : 'sign/emailCheck',
+        type : "POST",
+        data : {'email' : userEmail},
+        beforeSend: function(xhr){
+            xhr.setRequestHeader(header, token);
+        },
+        success : function(res){
+            if(res === true){
+                emailSpan.classList.remove('hidden')
+                emailSpan.innerHTML = '이미 이메일이 존재합니다 ㅋㅋ'
+                checkEmail = false
+                emailBtn.setAttribute('disabled', true)
+            } else {
+                emailSpan.classList.remove('hidden')
+                emailSpan.innerHTML = '사용가능한 이메일 입니다.'
+                emailSpan.style.color = 'green'
+                checkEmail = true
+                emailBtn.removeAttribute('disabled')
+            }
+        },
+        error : function(xhr){
+            console.log(xhr)
+        }
+    })
+
+})
+
+
 emailBtn.addEventListener('click', function(){
     const url = '/sign/email'
     const userEmail = document.querySelector('#email-input').value
@@ -293,24 +353,25 @@ emailBtn.addEventListener('click', function(){
         checkEmail = true
         console.log(checkEmail)
     }
+    const wrapper = document.querySelector('#check-code-wrapper');
+    wrapper.classList.remove('hidden')
+    emailBtn.setAttribute("disabled", true)
+    emailInput.setAttribute("readonly", true)
 
     $.ajax({
         url : url,
         type: "POST",
-        data : { 'email' : userEmail},
+        data : JSON.stringify({
+            'email' : userEmail,
+            'check' : 'sign'
+        }),
         beforeSend: function(xhr){
             xhr.setRequestHeader(header, token);
         },
-        success : function(){
-            const wrapper = document.querySelector('#check-code-wrapper');
-            wrapper.classList.remove('hidden')
-            alert('인증코드가 이메일로 발송되었습니다.')
-        },
+        accept : 'application/json',
+        contentType : 'application/json;charset=UTF-8',
         error : function (xhr){
-            console.log('---------')
-            console.log(xhr.status)
-            console.log(xhr.state())
-            console.log(xhr)
+            alert('이메일 주소를 확인해주세요')
         },
     })
 })
@@ -325,7 +386,9 @@ checkCodeBtn.addEventListener('click',function(){
     $.ajax({
         url : url,
         type : "POST",
-        data : { 'code' : valueOfCheck},
+        data : { 'code' : valueOfCheck,
+                 'email' : emailInput.value
+        },
         beforeSend: function(xhr){
             xhr.setRequestHeader(header, token);
         },
@@ -335,6 +398,7 @@ checkCodeBtn.addEventListener('click',function(){
                 const confirmCode = document.querySelector('#code-confirm')
                 confirmCode.classList.remove('hidden')
                 confirmCode.innerHTML = '<b>인증이 완료되었습니다.</b>'
+                confirmCode.style.color = 'green'
                 checkEmail = true
             } else {
                 const confirmCode = document.querySelector('#code-confirm')

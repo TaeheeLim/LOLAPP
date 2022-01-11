@@ -5,18 +5,67 @@
     <title>Spring Security Example </title>
 </head>
 <body>
-<div th:if="${param.error}">
-    Invalid username and password.
+<div id="login-container">
+    <div id="login-mid-container">
+        <div th:if="${param.error}">
+            Invalid username and password.
+        </div>
+        <div th:if="${param.logout}">
+            You have been logged out.
+        </div>
+        <div id="login-form">
+            <form th:action="@{/login}" method="post">
+                <div><label> User Name : <input type="text" name="username"/></label></div>
+                <div><label> Password: <input type="password" name="password"/></label></div>
+                <span><input type="submit" value="Sign In"/></span>
+                <span><input type="checkbox" name="remember-me">Remember ID</span>
+            </form>
+            <div>
+                <div>
+                    <a href="/sign/forgotId">Forgot your ID?</a>
+                </div>
+                <div>
+                    <a href="/sign/forgotPassword">Forgot your password?</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<div th:if="${param.logout}">
-    You have been logged out.
-</div>
-<button id="click-btn">Click Here!</button>
-<form th:action="@{/login}" method="post">
-    <div><label> User Name : <input type="text" name="username"/></label></div>
-    <div><label> Password: <input type="password" name="password"/></label></div>
-    <span><input type="submit" value="Sign In"/></span>
-    <span><input type="checkbox" id="remember-me">아이디 저장</span>
-</form>
 </body>
 </html>
+<style>
+#login-container {
+    /*border: 1px solid red;*/
+    height : 95vh;
+    display: flex;
+    justify-content: center;
+}
+
+#login-mid-container {
+    border: 1px solid green;
+    display: flex;
+    flex-direction: row;
+    /*justify-content: space-around;*/
+    /*height: 100%;*/
+    /*width: 100%;*/
+    /*padding: 30%;*/
+    padding-top: 20%;
+    background-color: coral;
+    width: 500px;
+    padding-left: 20%;
+}
+
+#login-form {
+    /*border: 1px solid blue;*/
+    /*width: 100%;*/
+    /*height: 100%;*/
+    display: flex;
+    flex-direction: column;
+    gap:20px;
+}
+
+a {
+    text-decoration: none;
+
+}
+</style>

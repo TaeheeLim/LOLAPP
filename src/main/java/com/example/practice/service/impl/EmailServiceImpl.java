@@ -1,46 +1,98 @@
 package com.example.practice.service.impl;
 
+import com.example.practice.entity.Member;
+import com.example.practice.mapper.MemberMapper;
 import com.example.practice.service.EmailService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import sun.security.util.Password;
 
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 @Service
+@RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
 
-    public static final String key = createKey();
+    private final MemberMapper memberMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final JavaMailSender emailSender;
 
-    @Autowired
-    JavaMailSender emailSender;;
+    public static final Map<String, Object> keyMap = new HashMap<>();
 
-    private MimeMessage createMessage(String to) throws Exception{
+
+    private MimeMessage createMessage(Map<String, String> map) throws MessagingException{
         MimeMessage  message = emailSender.createMimeMessage();
+        String newKey = createKey();
+        keyMap.put(map.get("email"), newKey);
 
-        message.addRecipients(Message.RecipientType.TO, to);//보내는 대상
-        message.setSubject("KANBOO.GG 인증번호가 도착했습니다.");//제목
+        try {
+            message.addRecipients(Message.RecipientType.TO, map.get("email"));//보내는 대상
+            message.setSubject("KANBOO.GG 인증번호가 도착했습니다.");//제목
+        } catch (MessagingException e) {
+            throw new MessagingException("message Exception");
+        }
+
 
         String msgg="";
         msgg+= "<div style='margin:100px;'>";
         msgg+= "<h1> 안녕하세요  KANBOO.GG입니다!!! </h1>";
         msgg+= "<br>";
-        msgg+= "<p>아래 코드를 회원가입 창으로 돌아가 입력해주세요<p>";
-        msgg+= "<br>";
-        msgg+= "<p>감사합니다!<p>";
-        msgg+= "<br>";
-        msgg+= "<div align='center' style='border:1px solid black; font-family:verdana';>";
-        msgg+= "<h3 style='color:blue;'>회원가입 코드입니다.</h3>";
-        msgg+= "<div style='font-size:130%'>";
-        msgg+= "CODE : <strong>";
-        msgg+= key + "</strong><div><br/> ";
+        if(map.get("check").equals("sign")){
+            msgg+= "<p>아래 코드를 회원가입 창으로 돌아가 입력해주세요<p>";
+            msgg+= "<br>";
+            msgg+= "<p>감사합니다!<p>";
+            msgg+= "<br>";
+            msgg+= "<div align='center' style='border:1px solid black; font-family:verdana';>";
+            msgg+= "<h3 style='color:blue;'>회원가입 코드입니다.</h3>";
+            msgg+= "<div style='font-size:130%'>";
+            msgg+= "CODE : <strong>";
+            msgg+= keyMap.get(map.get("email")) + "</strong><div><br/> ";
+        } else if(map.get("check").equals("id")){
+            Member member = memberMapper.selectMemberByEmail(map.get("email"));
+            message.setSubject("KANBOO.GG에서 아이디가 도착했습니다.");
+
+            msgg+= "<p>아이디 찾기<p>";
+            msgg+= "<div align='center' style='border:1px solid black; font-family:verdana';>";
+            msgg += "<h3 style='color:blue;'>회원 아이디입니다.</h3>";
+            msgg+= "<div style='font-size:130%'>";
+            msgg+= "아이디 : <strong>";
+            msgg+= member.getMemId() + "</strong><div><br/> ";
+        } else {
+            String memPassword = passwordEncoder.encode(newKey);
+            String memId = map.get("id");
+            int result = memberMapper.updatePassword(memPassword, memId);
+            if( result != 0){
+                message.setSubject("KANBOO.GG에서 임시비밀번호가 도착했습니다.");
+
+                msgg+= "<p>임시비밀번호 발급<p>";
+                msgg+= "<div align='center' style='border:1px solid black; font-family:verdana';>";
+                msgg += "<h3 style='color:blue;'>임시비밀번호 입니다.</h3>";
+                msgg+= "<div style='font-size:130%'>";
+                msgg+= "임시비밀번호 : <strong>";
+                msgg+= newKey + "</strong><div><br/> ";
+            } else {
+                message.setSubject("메시지 전송 실패");
+                msgg += "<p>메세지 전송 실패</p>";
+            }
+        }
         msgg+= "</div>";
         message.setText(msgg, "utf-8", "html");//내용
-        message.setFrom(new InternetAddress("ttky6807@gmail.com","KANBOO.GG"));//보내는 사람
+        try {
+            message.setFrom(new InternetAddress("ttky6807@gmail.com","KANBOO.GG"));//보내는 사람
+        } catch (UnsupportedEncodingException e) {
+            throw new MessagingException("unsupportedException");
+        }
         return message;
     }
 
@@ -71,13 +123,13 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendSimpleMessage(String to) throws Exception {
-        MimeMessage message = createMessage(to);
-        try{
+    public void sendSimpleMessage(Map<String, String> map) throws MessagingException {
+        MimeMessage message = null;
+        try {
+            message = createMessage(map);
             emailSender.send(message);
-        }catch(MailException es){
-            es.printStackTrace();
-            throw new IllegalArgumentException();
+        } catch (MessagingException e) {
+            throw new MessagingException();
         }
     }
 

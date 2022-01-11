@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <base href="/">
+    <!--    <link rel="stylesheet" type="text/css" href="../static/css/reset.css">-->
+</head>
+<body>
+<div>
+    <button id="testBtn">버튼</button>
+    <table>
+        <thead>
+            <tr>
+                <th>1</th>
+                <th>2</th>
+            </tr>
+        </thead>
+        <tbody id="board">
+            <tr th:each="member : ${testList}">
+                <td th:text="${member.memId}"></td>
+                <td th:text="${member.memNick}"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<script th:inline="javascript">
+    const token = $("meta[name='_csrf']").attr("content")
+    const header = $("meta[name='_csrf_header']").attr("content")
+    document.querySelector("#testBtn").addEventListener("click",()=>{
+        $.ajax({
+            url : "/board/event",
+            type : "POST",
+            beforeSend: function(xhr){
+                xhr.setRequestHeader(header, token);
+            }
+        })
+        .done((fragment)=>{
+            console.log(fragment)
+            $("#board").replaceWith(fragment);
+        })
+    });
+</script>

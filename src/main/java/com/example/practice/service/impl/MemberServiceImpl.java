@@ -5,7 +5,7 @@ import com.example.practice.entity.AccountContext;
 import com.example.practice.entity.Member;
 import com.example.practice.mapper.MemberMapper;
 import com.example.practice.service.MemberService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,12 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
-    @Autowired
-    private MemberMapper memberMapper;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final MemberMapper memberMapper;
+    private final PasswordEncoder passwordEncoder;
 
 
     //로그인 하면 일로옴 by Spring Security
@@ -31,8 +29,13 @@ public class MemberServiceImpl implements MemberService {
     public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
         Member member = memberMapper.selectMember(id);
 
+        if(member == null){
+            throw new UsernameNotFoundException(id + "is not found");
+        }
+
         List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        authorities.add(new SimpleGrantedAuthority(Role.ROLE_USER.getCode()));
+
         AccountContext accountContext = new AccountContext(member, authorities);
         return accountContext;
     }
@@ -61,9 +64,33 @@ public class MemberServiceImpl implements MemberService {
         }
         return false;
     }
+
+    @Override
+    public boolean checkIsMemberEmailExist(String email){
+        Member member = memberMapper.selectMemberByEmail(email);
+        if(member != null){
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public Member selectMember(String memIdx){
         return memberMapper.selectMember(memIdx);
+    }
+
+    @Override
+    public boolean forgotPassword(Member member) {
+        Member isMember = memberMapper.forgotPassword(member);
+        if(isMember != null){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public int updatePassword(String memPassword, String memId) {
+        return memberMapper.updatePassword(memPassword, memId);
     }
 
 }
