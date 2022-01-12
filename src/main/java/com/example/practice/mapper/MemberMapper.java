@@ -25,4 +25,6 @@ public interface MemberMapper {
     int updatePassword(String memPassword, String memId);
 
     int updateFailCount(String memId);
+
+    int resetFailCount(String memId);
 }

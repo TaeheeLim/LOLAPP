@@ -56,4 +56,11 @@
             SET LOGIN_FAIL_COUNT = LOGIN_FAIL_COUNT + 1
         WHERE MEM_ID = #{memId}
     </update>
+
+    <update id="resetFailCount" parameterType="String">
+        UPDATE member
+          SET LOGIN_FAIL_COUNT = 0
+        WHERE MEM_ID = #{memId}
+    </update>
+
 </mapper>

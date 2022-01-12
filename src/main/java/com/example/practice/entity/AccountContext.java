@@ -26,7 +26,7 @@ public class AccountContext implements UserDetails {
         this.member = member;
     }
     
-    public Member getAccount(){
+    public Member getMember(){
         return member;
     }
 

@@ -2,11 +2,11 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <title>Spring Security Example </title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 </head>
 <body>
 <div id="login-container">
     <div id="login-mid-container">
-
         <div th:if="${param.logout}">
             You have been logged out.
         </div>
@@ -36,24 +36,29 @@
 const exception = /*[[${param.exception}]]*/;
 const cnt = /*[[${param.cnt}]]*/;
 /* ]]> */
+    window.onbeforeunload = function(event){
+        if ((event.clientY < 0) ||(event.altKey) ||(event.ctrlKey)||((event.clientY < 129) && (event.clientY>107))) {
+            $.ajax({
+                url : "/logout"
+            });
+    }
+}
 
-if(exception!=null){
+if(exception!=null) {
     const error = document.querySelector(".exception");
     console.log(exception);
     console.log(error)
-    if(exception=="Password"){
+    if (exception == "Password") {
         error.innerHTML = "비밀번호가<b>" + cnt + "회</b> 틀렸습니다.";
-    }else if (exception=="Account"){
+    } else if (exception == "Account") {
         error.innerHTML = "<b>계정이</b> 존재하지 않습니다.";
-    }else if (exception=="Secret"){
+    } else if (exception == "Secret") {
         error.innerHTML = "잘못된 <b>토큰접근</b>입니다.";
-    }else if (exception=="Disable"){
-        error.innerHTML = "계정이 <b>잠겼습니다.</b>";
-    }else if (exception=="Duplicate"){
+    } else if (exception == "Disable") {
+        error.innerHTML = "계정이 <b>잠겼습니다.</b> <br> 본인 확인후 비밀번호를 변경해주세요";
+    } else if (exception == "Duplicate") {
         error.innerHTML = "계정이 이미 <b>접속중</b>입니다.";
     }
-
-
 }
 
 </script>

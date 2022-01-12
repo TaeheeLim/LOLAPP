@@ -3,6 +3,7 @@ package com.example.practice.service.impl;
 import com.example.practice.entity.Member;
 import com.example.practice.mapper.MemberMapper;
 import com.example.practice.service.EmailService;
+import com.sun.org.apache.xalan.internal.xslt.Process;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
@@ -71,8 +72,9 @@ public class EmailServiceImpl implements EmailService {
         } else {
             String memPassword = passwordEncoder.encode(newKey);
             String memId = map.get("id");
-            int result = memberMapper.updatePassword(memPassword, memId);
-            if( result != 0){
+            int resultOfUpdatePassword = memberMapper.updatePassword(memPassword, memId);
+            int resultOfResetPassword = memberMapper.resetFailCount(memId);
+            if( resultOfUpdatePassword != 0 && resultOfResetPassword != 0){
                 message.setSubject("KANBOO.GG에서 임시비밀번호가 도착했습니다.");
 
                 msgg+= "<p>임시비밀번호 발급<p>";
