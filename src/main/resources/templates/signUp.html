@@ -310,7 +310,7 @@ emailInput.addEventListener('keyup', function(){
         success : function(res){
             if(res === true){
                 emailSpan.classList.remove('hidden')
-                emailSpan.innerHTML = '이미 이메일이 존재합니다 ㅋㅋ'
+                emailSpan.innerHTML = '이미 이메일이 존재합니다'
                 checkEmail = false
                 emailBtn.setAttribute('disabled', true)
             } else {
@@ -327,7 +327,6 @@ emailInput.addEventListener('keyup', function(){
     })
 
 })
-
 
 emailBtn.addEventListener('click', function(){
     const url = '/sign/email'
@@ -370,7 +369,7 @@ emailBtn.addEventListener('click', function(){
         },
         accept : 'application/json',
         contentType : 'application/json;charset=UTF-8',
-        error : function (xhr){
+        error : function (){
             alert('이메일 주소를 확인해주세요')
         },
     })
@@ -429,7 +428,7 @@ checkCodeBtn.addEventListener('click',function(){
 #sign-list {
     display: flex;
     flex-direction: column;
-    gap:50px;
+    gap:10px;
     width: 60%;
     height: 80vh;
     padding-top: 100px;
@@ -444,8 +443,6 @@ input {
 #sign-list div {
     padding: 10px 20px;
     text-align: center;
-    border: 1px solid red;
-    
 }
 
 #sign-list div:last-child >button{

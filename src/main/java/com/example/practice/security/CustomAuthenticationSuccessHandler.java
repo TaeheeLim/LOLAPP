@@ -33,8 +33,6 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         Member member = ((AccountContext)authentication.getPrincipal()).getMember();
-        System.out.println("==========");
-        System.out.println(member.toString());
         if(member.getLoginFailCount() >= 5){
             throw new LockedException("Account locked");
         } else {
