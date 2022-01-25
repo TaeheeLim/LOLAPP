@@ -53,7 +53,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .sessionManagement()
                     .maximumSessions(1)
-                    .maxSessionsPreventsLogin(true)
+                    .maxSessionsPreventsLogin(false)
                     .expiredUrl("/login")
                     .sessionRegistry(sessionRegistry());
         http.rememberMe()
